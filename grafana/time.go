@@ -69,17 +69,44 @@ func NewTimeRange(from, to string) TimeRange {
 }
 
 // Formats Grafana 'From' time spec into absolute printable time
+// func (tr TimeRange) FromFormatted() string {
+// 	n := newNow()
+// 	return n.parseFrom(tr.From).Format(time.UnixDate)
+// }
+
+// // Formats Grafana 'To' time spec into absolute printable time
+// func (tr TimeRange) ToFormatted() string {
+// 	n := newNow()
+// 	return n.parseTo(tr.To).Format(time.UnixDate)
+// }
 func (tr TimeRange) FromFormatted() string {
-	n := newNow()
-	return n.parseFrom(tr.From).Format(time.UnixDate)
+    n := newNow()
+    // Load IST location
+    ist, err := time.LoadLocation("Asia/Kolkata")
+    if err != nil {
+        // Handle error
+        return ""
+    }
+    // Parse 'From' time and convert to IST
+    istFrom := n.parseFrom(tr.From).In(ist)
+    // Format time in desired layout
+    return istFrom.Format(time.UnixDate)
 }
 
-// Formats Grafana 'To' time spec into absolute printable time
+// Formats Grafana 'To' time spec into absolute printable time in IST
 func (tr TimeRange) ToFormatted() string {
-	n := newNow()
-	return n.parseTo(tr.To).Format(time.UnixDate)
+    n := newNow()
+    // Load IST location
+    ist, err := time.LoadLocation("Asia/Kolkata")
+    if err != nil {
+        // Handle error
+        return ""
+    }
+    // Parse 'To' time and convert to IST
+    istTo := n.parseTo(tr.To).In(ist)
+    // Format time in desired layout
+    return istTo.Format(time.UnixDate)
 }
-
 func newNow() now {
 	return now(time.Now())
 }
